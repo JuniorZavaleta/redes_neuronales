@@ -13,7 +13,7 @@ class Perceptron:
     weights = []
 
     def __init__(self, values_x, values_y, weights, threshold, activation_function, learning_rate, bias,
-                 message=None):
+                 message=None, debug=True):
         """
         :param values_x: Input values
         :param values_y: Expected values
@@ -30,21 +30,25 @@ class Perceptron:
         self.learning_rate = learning_rate
         self.bias = bias
         self.message = message if message is not None else "Results"
+        self.debug = debug
 
     def training(self):
         has_error = True
         it = 1
         while has_error:
             has_error = False
-            print("# Iteration " + str(it))
-            print("X    |d |y |W")
+
+            if self.debug:
+                print("# Iteration " + str(it))
+                print("X    |d |y |W")
 
             for i in range(len(self.values_x)):
                 dot_product = sum(value * weight for value, weight in zip(self.values_x[i], self.weights))
                 y = self.activation_function(dot_product + self.bias, self.threshold)
                 error = self.values_y[i] - y
 
-                print("{0}|{1} |{2} |{3}".format(self.values_x[i], self.values_y[i], y, self.weights))
+                if self.debug:
+                    print("{0}|{1} |{2} |{3}".format(self.values_x[i], self.values_y[i], y, self.weights))
 
                 if error != 0:
                     self.threshold = self.threshold - (error * self.values_y[i] * self.learning_rate)
@@ -55,9 +59,14 @@ class Perceptron:
             it = it + 1
         self.print_results_training()
 
+    def evaluate(self, test_input):
+        dot_product = sum(value * weight for value, weight in zip(test_input, self.weights))
+        y = self.activation_function(dot_product + self.bias, self.threshold)
+        return y
+
     def print_results_training(self):
         print_line()
         print("{0}: {1}".format(self.message, self.weights))
-        print('TH: {0}'.format(self.threshold))
+        print('TH (Umbral): {0}'.format(self.threshold))
         print_line()
 
